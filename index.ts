@@ -1,40 +1,37 @@
-const { Client, Intents, Interaction } = require('discord.js');
+const fs = require('node:fs');
+const path = require('node:path');
+const { Client, Collection, Intents, Interaction } = require('discord.js');
 const { token } = require('./config.json');
-const { createAudioPlayer, createAudioResource , joinVoiceChannel, audioPlayer} = require('@discordjs/voice');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES] });
+
+client.commands = new Collection();
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter((file : string) => file.endsWith('.ts'));
+
+for (const file of commandFiles) {
+	const filePath = path.join(commandsPath, file);
+	const command = require(filePath);
+	client.commands.set(command.data.name, command);
+}
 
 client.once('ready', () => {
 	console.log('Ready!');
 });
 
-client.on('interactionCreate', async (interaction : typeof Interaction) => {
+client.on('interactionCreate',  async (interaction : typeof Interaction) => {
 	if (!interaction.isCommand()) return;
 
-	const { commandName } = interaction;
+	const command = client.commands.get(interaction.commandName);
 
-	if (commandName === 'music') {
-		const connection = joinVoiceChannel({
-			//channelId: interaction.channelId,
-			channelId: "466944850919686147",
-			guildId: interaction.guildId,
-			adapterCreator: interaction.guild.voiceAdapterCreator,
-		});
+	if (!command) return;
 
-		const player = createAudioPlayer();
-		const resource = createAudioResource('/home/falia/Downloads/86S2-OP1.webm');
-		player.play(resource);
-
-		// Subscribe the connection to the audio player (will play audio on the voice connection)
-		const subscription = connection.subscribe(player);
-
-		// subscription could be undefined if the connection is destroyed!
-		if (subscription) {
-			// Unsubscribe after 5 seconds (stop playing audio on the voice connection)
-			setTimeout(() => subscription.unsubscribe(), 20_000);
-		}
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
 });
+
 client.login(token);
-
-
