@@ -1,6 +1,7 @@
 import { BaseCommandInteraction, Client } from "discord.js";
 import { Command } from "../Command";
-import { joinVoiceChannel, DiscordGatewayAdapterCreator } from '@discordjs/voice';
+import VoiceChannel from './../class/GuessAnime/VoiceChannel';
+import Game from './../class/GuessAnime/Game';
 
 export const GuessAnimesOpenings: Command = {
     name: "guess-animes-openings",
@@ -8,15 +9,43 @@ export const GuessAnimesOpenings: Command = {
     type: "CHAT_INPUT",
     run: async (client: Client, interaction: BaseCommandInteraction) => {
 
-        const channel = await interaction!.guild!.channels.create("VC_NAME", {
-            type: "GUILD_VOICE" 
-        });
+        let voiceChannel = new VoiceChannel(interaction!.guild!);
+        await voiceChannel.create();
+        voiceChannel.join();
 
-        joinVoiceChannel({
-            channelId: channel.id,
-            guildId: interaction!.guild!.id,
-            adapterCreator: interaction!.guild!.voiceAdapterCreator as DiscordGatewayAdapterCreator,
-        })
+        let game = new Game()
+        game.initTurn();
+        // TODO check if exist before join
+
+
 
     }
 };
+
+/**
+ * Folder class/GuessAnime/
+ * VoiceChannel
+ * - create
+ * - destroy
+ * - getName
+ * - exist
+ * 
+ * Game
+ * - create
+ * - checkAnswer
+ * 
+ * Anime
+ * - get
+ * 
+ * Music
+ * - play
+ * 
+ * TextChannel
+ * - create
+ * - destroy
+ * - sendAnimesAnswers
+ * 
+ * 
+ * 
+ * 
+ */
