@@ -1,6 +1,6 @@
-export default class Animes {
+export class Animes {
 
-    get()
+    get() : AnimeInterface[]
     {
         return [
            {
@@ -24,4 +24,9 @@ export default class Animes {
            }
         ]
     }
+}
+
+export interface AnimeInterface {
+    title: string,
+    openings: Array<string>
 }

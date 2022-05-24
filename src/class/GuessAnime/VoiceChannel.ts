@@ -1,5 +1,5 @@
 import { Guild, VoiceChannel as VoiceChannelDiscordJS } from "discord.js";
-import { joinVoiceChannel, DiscordGatewayAdapterCreator } from '@discordjs/voice';
+import { joinVoiceChannel, DiscordGatewayAdapterCreator, VoiceConnection } from '@discordjs/voice';
 
 export default class VoiceChannel {
     name: string;
@@ -29,9 +29,9 @@ export default class VoiceChannel {
         this.channel = channel;
     }
 
-    join()
+    join() : VoiceConnection
     {
-        joinVoiceChannel({
+        return joinVoiceChannel({
             channelId: this.channel!.id,
             guildId: this.guild.id,
             adapterCreator: this.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator,

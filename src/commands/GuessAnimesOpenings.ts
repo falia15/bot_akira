@@ -1,7 +1,9 @@
-import { BaseCommandInteraction, Client } from "discord.js";
+import { BaseCommandInteraction, Client, TextChannel as TextChannelDiscordJs } from "discord.js";
 import { Command } from "../Command";
 import VoiceChannel from './../class/GuessAnime/VoiceChannel';
 import Game from './../class/GuessAnime/Game';
+import Music from './../class/GuessAnime/Music';
+import TextChannel from './../class/GuessAnime/TextChannel';
 
 export const GuessAnimesOpenings: Command = {
     name: "guess-animes-openings",
@@ -11,14 +13,24 @@ export const GuessAnimesOpenings: Command = {
 
         let voiceChannel = new VoiceChannel(interaction!.guild!);
         await voiceChannel.create();
-        voiceChannel.join();
-
-        let game = new Game()
-        game.initTurn();
+        let connection = voiceChannel.join();
         // TODO check if exist before join
 
+        let music = new Music();
+        let game = new Game()
+        let textChannel = new TextChannel();
 
+        game.initTurn();
 
+        let musicLink = game.getOpeningToGuess();
+        music.play(musicLink!, connection);
+
+        let answers = game.getAnswers();
+        let messageContent = textChannel.getAnswersMessage(answers);
+
+        //await interaction.reply(messageContent);
+        let channel = interaction!.channel as TextChannelDiscordJs;
+        channel.send(messageContent)
     }
 };
 

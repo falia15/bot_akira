@@ -1,12 +1,16 @@
-import Animes from './Animes';
+import { Animes, AnimeInterface} from './Animes';
 
 export default class Game {
-    animes: Array<{}>;
+    answers: Array<string>;
+    openingToGuess: string | null;
+    animes: AnimeInterface[];
 
     constructor() 
     {
         let animes = new Animes();
         this.animes = animes.get();
+        this.answers = [];
+        this.openingToGuess = null;
     }
 
     initTurn()
@@ -15,15 +19,28 @@ export default class Game {
         const shuffled = this.animes.sort(() => 0.5 - Math.random());
 
         // Get sub-array of first n (here answers) elements after shuffled
-        let animesAnswers = shuffled.slice(0, 2);
+        let answers = shuffled.slice(0, 2);
 
         // order answer by name
-        animesAnswers.sort((a, b) => (a.title > b.title) ? 1 : -1);
+        answers.sort((a, b) => (a.title > b.title) ? 1 : -1);
+        let mappedAnswer = answers.map((item) => (item.title));
 
-        let animeToGuess = animesAnswers[Math.floor(Math.random()*animesAnswers.length)];
-
+        let animeToGuess = answers[Math.floor(Math.random()*answers.length)];
         let animeOpening = animeToGuess.openings;
         let openingToGuess = animeOpening[Math.floor(Math.random()*animeOpening.length)];
+
+        this.answers = mappedAnswer;
+        this.openingToGuess = openingToGuess;
+    }
+
+    getOpeningToGuess()
+    {
+        return this.openingToGuess;
+    }
+
+    getAnswers()
+    {
+        return this.answers;
     }
 
 }
